@@ -1,12 +1,15 @@
 var jQuery = (function() {
 
 // Define a local copy of jQuery
+    // いきなり何やってるかわからない...
 var jQuery = function( selector, context ) {
 		// The jQuery object is actually just the init constructor 'enhanced'
+    // この jQuery.fn を呼んでるほうの jQuery の中身はなんだ？
 		return new jQuery.fn.init( selector, context, rootjQuery );
-	},
+	}, // カンマ区切りなので var a = 1, b = 2, ... みたいに変数宣言が続いてる
 
 	// Map over jQuery in case of overwrite
+    // これもなんだろう、上書きされても良いように _jQuery _$ に退避している？
 	_jQuery = window.jQuery,
 
 	// Map over the $ in case of overwrite
@@ -44,6 +47,8 @@ var jQuery = function( selector, context ) {
 	rmsie = /(msie) ([\w.]+)/,
 	rmozilla = /(mozilla)(?:.*? rv:([\w.]+))?/,
 
+    // 以上、正規表現ユーティリティ集。必要になったらここからコピペで使えるかも。 JSON とか。
+
 	// Keep a UserAgent string for use with jQuery.browser
 	userAgent = navigator.userAgent,
 
@@ -54,9 +59,11 @@ var jQuery = function( selector, context ) {
 	readyBound = false,
 
 	// The deferred used on DOM ready
+    // deferred って jQuery 1.5 から入ったあれかな？ JSDeferred のあれ。
 	readyList,
 
 	// Promise methods (with equivalent for invert)
+    // なにに使うかわからないけど定数みたいなもの？
 	promiseMethods = {
 		then: 0, // will be overwritten for invert
 		done: "fail",
@@ -71,6 +78,7 @@ var jQuery = function( selector, context ) {
 	DOMContentLoaded,
 
 	// Save a reference to some core methods
+    // JavaScript のビルトインクラスのメソッドは prototype 経由で参照できるのか
 	toString = Object.prototype.toString,
 	hasOwn = Object.prototype.hasOwnProperty,
 	push = Array.prototype.push,
@@ -81,8 +89,13 @@ var jQuery = function( selector, context ) {
 	// [[Class]] -> type pairs
 	class2type = {};
 
+    // jQuery.prototype = {} なので jQuery っていう function オブジェクトのプロトタイプチェーンに init とかメソッドをはやしてる
+    // jQuery.fn = はなんだろう...
 jQuery.fn = jQuery.prototype = {
+    // これわからない。 constructor って何か特別な意味のあるキーワードなのか？
+    // ちがうわ、 jQuery オブジェクトを参照してるので、 this.constructor() で jQuery() と等価。
 	constructor: jQuery,
+    // どうやらここが $(selector) とかの実体らしい雰囲気
 	init: function( selector, context, rootjQuery ) {
 		var match, elem, ret, doc;
 
@@ -158,6 +171,7 @@ jQuery.fn = jQuery.prototype = {
 						this[0] = elem;
 					}
 
+                                    // さっきから context てのが出てくるけどこれは何だろう...
 					this.context = document;
 					this.selector = selector;
 					return this;
@@ -173,6 +187,10 @@ jQuery.fn = jQuery.prototype = {
 				return this.constructor( context ).find( selector );
 			}
 
+                    // ここまでが $('div') $('#foo') とか。
+
+                    // このあとは $(function(){}) つまり $(document).ready() の略
+                    
 		// HANDLE: $(function)
 		// Shortcut for document ready
 		} else if ( jQuery.isFunction( selector ) ) {
@@ -217,16 +235,21 @@ jQuery.fn = jQuery.prototype = {
 			( num < 0 ? this[ this.length + num ] : this[ num ] );
 	},
 
+    // スタックに積む？なにを？
 	// Take an array of elements and push it onto the stack
 	// (returning the new matched element set)
 	pushStack: function( elems, name, selector ) {
 		// Build a new jQuery matched element set
+
+            // ここで constructor がでてきた。
 		var ret = this.constructor();
 
 		if ( jQuery.isArray( elems ) ) {
 			push.apply( ret, elems );
 
 		} else {
+
+                    // これもちらほらみるけど、 merge ってなんだろう。
 			jQuery.merge( ret, elems );
 		}
 
@@ -234,6 +257,8 @@ jQuery.fn = jQuery.prototype = {
 		ret.prevObject = this;
 
 		ret.context = this.context;
+
+            // これは $().find() を呼んだ時にとおるのかな
 
 		if ( name === "find" ) {
 			ret.selector = this.selector + (this.selector ? " " : "") + selector;
@@ -245,6 +270,8 @@ jQuery.fn = jQuery.prototype = {
 		return ret;
 	},
 
+    // よくわからない pushStack ここでおわり...
+
 	// Execute a callback for every element in the matched set.
 	// (You can seed the arguments with an array of args, but this is
 	// only used internally.)
@@ -252,6 +279,8 @@ jQuery.fn = jQuery.prototype = {
 		return jQuery.each( this, callback, args );
 	},
 
+
+    // $(document).ready() の実体はここか。
 	ready: function( fn ) {
 		// Attach the listeners
 		jQuery.bindReady();
@@ -262,6 +291,7 @@ jQuery.fn = jQuery.prototype = {
 		return this;
 	},
 
+    // このへんもなんか呼び出しが深い。 first last とかを eq 使ってる。そして eq は slice つかってる。再利用しまくり。
 	eq: function( i ) {
 		return i === -1 ?
 			this.slice( i ) :
@@ -275,6 +305,8 @@ jQuery.fn = jQuery.prototype = {
 	last: function() {
 		return this.eq( -1 );
 	},
+
+    // ここで pushStack がでてきたので pushStack が読めないとわからないまま...
 
 	slice: function() {
 		return this.pushStack( slice.apply( this, arguments ),
@@ -298,6 +330,9 @@ jQuery.fn = jQuery.prototype = {
 	splice: [].splice
 };
 
+    // ここまでで jQuery.fn = jQuery.prototype おわり
+
+    // これもなにがなにやら... fn.init は function で jQuery.fn も function で...???
 // Give the init function the jQuery prototype for later instantiation
 jQuery.fn.init.prototype = jQuery.fn;
 
